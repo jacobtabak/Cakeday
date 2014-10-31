@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="orange_primary">#ff841b</color>
+    <color name="orange_dark">#a65109</color>
+    <color name="orange_light">#ffbc82</color>
+    <color name="orange_pale">#bf7a3f</color>
+    <color name="orange_bright">#ffa354</color>
+
+    <color name="orange_accent">#11949a</color>
+
+    <color name="grey">#888888</color>
+</resources>

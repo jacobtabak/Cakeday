@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Cake Day</string>
+    <string name="in">in</string>
+    <string name="link_bottom_line_template">%1$d Comments • %2$s • %3$s</string>
+    <string name="listing_hot">Hot</string>
+    <string name="listing_new">New</string>
+    <string name="listing_rising">Rising</string>
+    <string name="listing_top">Top</string>
+    <string name="listing_controversial">Controversial</string>
+    <string name="sort">Sort</string>
+    <string name="clear_all">Clear All</string>
+</resources>

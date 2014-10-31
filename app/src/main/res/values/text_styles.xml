@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="text_orange_small" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">@color/orange_primary</item>
+    </style>
+</resources>

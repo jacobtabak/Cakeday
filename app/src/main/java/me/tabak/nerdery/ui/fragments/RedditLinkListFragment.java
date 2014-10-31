@@ -37,7 +37,6 @@ import me.tabak.nerdery.data.reddit.model.RedditObject;
 import me.tabak.nerdery.rx.EndlessObserver;
 import me.tabak.nerdery.ui.SpacerDecoration;
 import me.tabak.nerdery.ui.recycler.anim.MyItemAnimator;
-import me.tabak.nerdery.ui.viewholder.ProgressBarViewHolder;
 import me.tabak.nerdery.ui.viewholder.RedditLinkViewHolder;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -158,48 +157,26 @@ public class RedditLinkListFragment extends Fragment {
         .observeOn(AndroidSchedulers.mainThread());
   }
 
-  private class RedditLinkAdapter extends RecyclerView.Adapter {
-    public static final int TYPE_CARD = 0;
-    public static final int TYPE_PROGRESSBAR = 1;
+  private class RedditLinkAdapter extends RecyclerView.Adapter<RedditLinkViewHolder> {
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-      if (i == TYPE_CARD) {
-        CardView cardView = new CardView(getActivity());
-        cardView.setLayoutParams(new RecyclerView.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        getLayoutInflater(null).inflate(R.layout.view_reddit_link, cardView, true);
-        return new RedditLinkViewHolder(cardView);
-      } else {
-        View view = getLayoutInflater(null).inflate(R.layout.view_progressbar, viewGroup, false);
-        return new ProgressBarViewHolder(view);
-      }
+    public RedditLinkViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+      CardView cardView = new CardView(getActivity());
+      cardView.setLayoutParams(new RecyclerView.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+      getLayoutInflater(null).inflate(R.layout.view_reddit_link, cardView, true);
+      return new RedditLinkViewHolder(cardView);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-      if (getItemViewType(position) == TYPE_CARD) {
-        ((RedditLinkViewHolder)holder).bindView(mLinks.get(position));
-      } else {
-        // Hide the progressbar when there are no cards.
-        // The spinner at the top will be shown instead.
-        holder.itemView.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
-      }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-      if (position == mLinks.size()) {
-        return TYPE_PROGRESSBAR;
-      } else {
-        return TYPE_CARD;
-      }
+    public void onBindViewHolder(RedditLinkViewHolder holder, int position) {
+      holder.bindView(mLinks.get(position));
     }
 
     @Override
     public int getItemCount() {
       // Always add one extra slot at the end for the 'loading more items' view.
-      return mLinks.size() > 0 ? mLinks.size() + 1 : 0;
+      return mLinks.size();
     }
   }
 

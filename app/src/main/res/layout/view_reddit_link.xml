@@ -2,61 +2,80 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_vertical"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="@dimen/medium">
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="1"
+    <me.tabak.nerdery.ui.view.DynamicImageView
+        android:id="@+id/link_full_imageview"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        tools:src="@drawable/test_image"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginBottom="@dimen/medium"
+        android:adjustViewBounds="true"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="bottom">
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="bottom">
+                <TextView
+                    android:id="@+id/link_score_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:layout_marginRight="@dimen/micro"
+                    android:layout_marginEnd="4dp"
+                    tools:text="984"/>
+                <TextView
+                    android:id="@+id/link_top_line_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:textAppearance="@style/text_orange_small"
+                    tools:text="Line 1"/>
+            </LinearLayout>
             <TextView
-                android:id="@+id/link_score_textview"
+                android:id="@+id/link_title_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:layout_marginRight="@dimen/micro"
-                android:layout_marginEnd="4dp"
-                tools:text="984"/>
+                android:textColor="@android:color/black"
+                android:layout_marginTop="@dimen/micro"
+                android:layout_marginBottom="@dimen/micro"
+                tools:text="Line 2"/>
             <TextView
-                android:id="@+id/link_top_line_textview"
-                android:layout_width="0dp"
+                android:id="@+id/link_bottom_line_textview"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:textAppearance="@style/text_orange_small"
-                tools:text="Line 1"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                tools:text="Line 3"/>
         </LinearLayout>
-        <TextView
-            android:id="@+id/link_title_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@android:color/black"
-            android:layout_marginTop="@dimen/micro"
-            android:layout_marginBottom="@dimen/micro"
-            tools:text="Line 2"/>
-        <TextView
-            android:id="@+id/link_bottom_line_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            tools:text="Line 3"/>
+        <ImageView
+            android:id="@+id/link_preview_imageview"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="@dimen/small"
+            android:layout_marginStart="@dimen/small"
+            tools:visibility="visible"
+            tools:src="@android:color/black"/>
     </LinearLayout>
-    <ImageView
-        android:id="@+id/link_preview_imageview"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginLeft="@dimen/small"
-        android:layout_marginStart="@dimen/small"
-        tools:visibility="visible"
-        tools:src="@android:color/black"/>
-
+    <TextView
+        android:id="@+id/link_selftext_textview"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 </LinearLayout>

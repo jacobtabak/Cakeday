@@ -3,22 +3,15 @@ package me.tabak.nerdery.ui.fragments;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.tabak.nerdery.MainActivity;
 import me.tabak.nerdery.MyApplication;
@@ -27,7 +20,6 @@ import me.tabak.nerdery.data.reddit.RedditService;
 import me.tabak.nerdery.data.reddit.model.RedditLink;
 import me.tabak.nerdery.data.reddit.model.RedditObject;
 import me.tabak.nerdery.rx.EndlessObserver;
-import me.tabak.nerdery.ui.SpacerDecoration;
 import me.tabak.nerdery.ui.recycler.anim.MyItemAnimator;
 import me.tabak.nerdery.ui.viewholder.RedditLinkViewHolder;
 import rx.Observable;
@@ -39,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RedditLinkListFragment extends Fragment {
+public class RedditLinkListFragment extends RecyclerFragment {
   public static final int LIMIT = 25;
   @Inject RedditService mRedditService;
   @InjectView(R.id.recyclerview) RecyclerView mRecyclerView;
@@ -61,60 +53,23 @@ public class RedditLinkListFragment extends Fragment {
     mActivity = (MainActivity) getActivity();
     setHasOptionsMenu(true);
     mActivity.setTitle(getString(R.string.app_name) + " - " + getString(R.string.listing_hot));
-  }
-
-  @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.fragment_link_list, container, false);
-    ButterKnife.inject(this, view);
-    return view;
+    if (savedInstanceState == null) {
+      createRequest(true).subscribe(new LinksObserver());
+    }
   }
 
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    mSwipeRefreshLayout.setColorSchemeColors(
-        getResources().getColor(R.color.orange_bright),
-        getResources().getColor(R.color.orange_dark),
-        getResources().getColor(R.color.orange_light),
-        getResources().getColor(R.color.orange_pale)
-    );
     mRefreshListener = new LinksRefreshListener();
     mSwipeRefreshLayout.setOnRefreshListener(mRefreshListener);
     mSwipeRefreshLayout.setRefreshing(true);
     mLayoutManager = new LinearLayoutManager(getActivity());
     mRecyclerView.setLayoutManager(mLayoutManager);
     mRecyclerView.setAdapter(mAdapter);
-    mRecyclerView.addItemDecoration(new SpacerDecoration());
     mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
     mRecyclerView.setOnScrollListener(new LinkListScrollListener());
-    createRequest(true).subscribe(new LinksObserver());
-  }
 
-  @Override
-  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
-    // Appends the actionbar height to the padding so we can hide it later.
-    final Toolbar toolbar = mActivity.getToolbar();
-    toolbar.getViewTreeObserver().addOnGlobalLayoutListener(
-        new ViewTreeObserver.OnGlobalLayoutListener() {
-          @SuppressWarnings("deprecation")
-          @Override
-          public void onGlobalLayout() {
-            toolbar.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-            int medium = getResources().getDimensionPixelSize(R.dimen.medium);
-            mSwipeRefreshLayout.setProgressViewOffset(
-                true, toolbar.getHeight(), toolbar.getHeight());
-            mSwipeRefreshLayout.setProgressViewEndTarget(
-                true, toolbar.getHeight() + medium);
-            mRecyclerView.setPadding(
-                mRecyclerView.getPaddingLeft(),
-                mRecyclerView.getPaddingTop() + toolbar.getHeight(),
-                mRecyclerView.getPaddingRight(),
-                mRecyclerView.getPaddingBottom());
-          }
-        });
   }
 
   @Override
@@ -168,7 +123,7 @@ public class RedditLinkListFragment extends Fragment {
 
     @Override
     public void onBindViewHolder(RedditLinkViewHolder holder, int position) {
-      holder.bindView(mLinks.get(position));
+      holder.bindView(mLinks.get(position), false);
       holder.itemView.setOnClickListener(v -> mActivity.showDetailFragment(mLinks.get(position)));
     }
 
@@ -256,32 +211,9 @@ public class RedditLinkListFragment extends Fragment {
   }
 
   private class LinkListScrollListener extends RecyclerView.OnScrollListener {
-    private boolean mAnimating;
-
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
       super.onScrolled(recyclerView, dx, dy);
-
-      // Show or hide the toolbar when scrolling.
-      if (!mAnimating) {
-        Toolbar toolbar = mActivity.getToolbar();
-        int minDistance = getResources().getDimensionPixelOffset(R.dimen.medium);
-        float translation = ViewCompat.getTranslationY(toolbar);
-        if ((dy > minDistance && translation == 0) ||
-            (dy < minDistance && translation == -toolbar.getHeight())) {
-          mAnimating = true;
-          boolean visible = dy < 0;
-          Timber.d("Starting animation");
-          mActivity.animateToolbarVisibility(visible)
-              .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(View view) {
-                  super.onAnimationEnd(view);
-                  mAnimating = false;
-                }
-              });
-        }
-      }
 
       // Load more items when the progressbar becomes visible.
       if (!mSwipeRefreshLayout.isRefreshing()) {

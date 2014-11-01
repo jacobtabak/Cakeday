@@ -9,4 +9,5 @@
     <string name="listing_controversial">Controversial</string>
     <string name="sort">Sort</string>
     <string name="clear_all">Clear All</string>
+    <string name="show_list">Show List</string>
 </resources>

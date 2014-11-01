@@ -2,6 +2,7 @@ package me.tabak.nerdery.ui.viewholder;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -9,16 +10,15 @@ import android.text.style.TextAppearanceSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.koushikdutta.ion.Ion;
-
-import org.ocpsoft.prettytime.PrettyTime;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import com.koushikdutta.ion.Ion;
 import me.tabak.nerdery.MainActivity;
 import me.tabak.nerdery.R;
 import me.tabak.nerdery.data.reddit.model.RedditLink;
+import me.tabak.nerdery.ui.view.CustomLinkMovementMethod;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.ocpsoft.prettytime.PrettyTime;
 
 public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
   private static final String DEFAULT = "default";
@@ -30,18 +30,22 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
   @InjectView(R.id.link_title_textview) TextView mTitleTextView;
   @InjectView(R.id.link_bottom_line_textview) TextView mBottomLineTextView;
   @InjectView(R.id.link_preview_imageview) ImageView mPreviewImageView;
+  @InjectView(R.id.link_full_imageview) ImageView mFullImageView;
+  @InjectView(R.id.link_selftext_textview) TextView mSelfTextView;
 
   public RedditLinkViewHolder(View itemView) {
     super(itemView);
     mContext = itemView.getContext();
     ButterKnife.inject(this, itemView);
+    mSelfTextView.setMovementMethod(new CustomLinkMovementMethod((MainActivity) itemView.getContext()));
   }
 
-  public void bindView(RedditLink link) {
+  public void bindView(RedditLink link, boolean full) {
     bindFirstLine(link);
     bindTitle(link);
     bindThirdLine(link);
-    bindPreview(link);
+    bindImage(link, full);
+    bindSelfText(link, full);
   }
 
   private void bindFirstLine(RedditLink link) {
@@ -75,16 +79,52 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
     mBottomLineTextView.setText(text);
   }
 
-  private void bindPreview(RedditLink link) {
-    // don't show a preview image if it's a self post or has a default thumbnail
-    String thumbnail = link.getThumbnail();
-    if (TextUtils.isEmpty(thumbnail) || SELF.equals(thumbnail) || DEFAULT.equals(thumbnail)) {
-      mPreviewImageView.setVisibility(View.GONE);
+  private void bindImage(RedditLink link, boolean full) {
+    mPreviewImageView.setVisibility(View.GONE);
+    mFullImageView.setVisibility(View.GONE);
+    if (!full) {
+      // don't show a preview image if it's a self post or has a default thumbnail
+      if (isValidThumb(link.getThumbnail())) {
+        mPreviewImageView.setVisibility(View.VISIBLE);
+        Ion.with(mPreviewImageView)
+            .smartSize(true)
+            .load(link.getThumbnail());
+      }
     } else {
-      mPreviewImageView.setVisibility(View.VISIBLE);
-      Ion.with(mPreviewImageView)
-          .smartSize(true)
-          .load(thumbnail);
+      String imageUrl = null;
+      if (isImageUrl(link.getUrl())) {
+        imageUrl = link.getUrl();
+      } else if (isValidThumb(link.getThumbnail())) {
+        imageUrl = link.getThumbnail();
+      }
+      if (imageUrl != null) {
+        Ion.with(mFullImageView)
+            .animateGif(true)
+            .load(imageUrl)
+            .setCallback((e, result) -> {
+              if (e == null) {
+                mFullImageView.setVisibility(View.VISIBLE);
+              }
+            });
+      }
     }
+  }
+
+  private void bindSelfText(RedditLink link, boolean full) {
+    if (full && !TextUtils.isEmpty(link.getSelftextHtml())) {
+      mSelfTextView.setVisibility(View.VISIBLE);
+      String html = StringEscapeUtils.unescapeHtml(link.getSelftextHtml());
+      mSelfTextView.setText(Html.fromHtml(html));
+    } else {
+      mSelfTextView.setVisibility(View.GONE);
+    }
+  }
+
+  private boolean isValidThumb(String url) {
+    return (!TextUtils.isEmpty(url) && !SELF.equals(url) && !DEFAULT.equals(url));
+  }
+
+  private boolean isImageUrl(String url) {
+    return !TextUtils.isEmpty(url) && (url.endsWith(".jpg") || url.endsWith(".gif") || url.endsWith(".png"));
   }
 }

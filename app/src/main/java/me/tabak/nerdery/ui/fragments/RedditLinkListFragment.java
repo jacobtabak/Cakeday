@@ -18,14 +18,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateInterpolator;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.tabak.nerdery.MainActivity;
@@ -41,6 +33,11 @@ import me.tabak.nerdery.ui.viewholder.RedditLinkViewHolder;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RedditLinkListFragment extends Fragment {
   public static final int LIMIT = 25;
@@ -68,7 +65,7 @@ public class RedditLinkListFragment extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                           @Nullable Bundle savedInstanceState) {
+      @Nullable Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_link_list, container, false);
     ButterKnife.inject(this, view);
     return view;
@@ -85,6 +82,7 @@ public class RedditLinkListFragment extends Fragment {
     );
     mRefreshListener = new LinksRefreshListener();
     mSwipeRefreshLayout.setOnRefreshListener(mRefreshListener);
+    mSwipeRefreshLayout.setRefreshing(true);
     mLayoutManager = new LinearLayoutManager(getActivity());
     mRecyclerView.setLayoutManager(mLayoutManager);
     mRecyclerView.setAdapter(mAdapter);
@@ -271,11 +269,9 @@ public class RedditLinkListFragment extends Fragment {
         if ((dy > minDistance && translation == 0) ||
             (dy < minDistance && translation == -toolbar.getHeight())) {
           mAnimating = true;
+          boolean visible = dy < 0;
           Timber.d("Starting animation");
-          ViewCompat.animate(toolbar)
-              .setInterpolator(new AccelerateInterpolator())
-              .setDuration(200)
-              .translationY(dy > 0 ? -toolbar.getHeight() : 0)
+          mActivity.animateToolbarVisibility(visible)
               .setListener(new ViewPropertyAnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(View view) {

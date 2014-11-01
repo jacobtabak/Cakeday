@@ -17,8 +17,6 @@ public class MyItemAnimator extends DefaultItemAnimator {
     mLayoutManager = layoutManager;
   }
 
-
-
   public boolean animateRemove(RecyclerView.ViewHolder holder) {
     final View view = holder.itemView;
     int width = getWidth(holder);

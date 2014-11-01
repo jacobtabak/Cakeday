@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/webview_back"
+        android:icon="@drawable/ic_action_arrow_left"
+        android:title="Back"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/webview_forward"
+        android:icon="@drawable/ic_action_arrow_right"
+        android:title="Forward"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/webview_reload"
+        android:icon="@drawable/ic_action_reload"
+        android:title="Reload"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/webview_browser"
+        android:icon="@drawable/ic_action_export"
+        android:title="Open in Browser"
+        app:showAsAction="always"/>
+</menu>

@@ -9,12 +9,16 @@ import android.text.style.TextAppearanceSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.koushikdutta.ion.Ion;
+
+import org.ocpsoft.prettytime.PrettyTime;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import com.koushikdutta.ion.Ion;
+import me.tabak.nerdery.MainActivity;
 import me.tabak.nerdery.R;
 import me.tabak.nerdery.data.reddit.model.RedditLink;
-import org.ocpsoft.prettytime.PrettyTime;
 
 public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
   private static final String DEFAULT = "default";
@@ -44,7 +48,7 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
     mScoreTextView.setText(String.valueOf(link.getScore()));
 
     SpannableStringBuilder builder = new SpannableStringBuilder();
-    TextAppearanceSpan greySpan = new TextAppearanceSpan(mContext, R.style.TextAppearance_AppCompat_Small);
+    TextAppearanceSpan greySpan = new TextAppearanceSpan(mContext, R.style.TextAppearance_AppCompat_Caption);
     builder.append(link.getAuthor());
     builder.append(" ").append(mContext.getString(R.string.in)).append(" ");
     int spanEnd = builder.length();
@@ -56,6 +60,12 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
 
   private void bindTitle(RedditLink link) {
     mTitleTextView.setText(link.getTitle());
+    mTitleTextView.setOnClickListener(v -> {
+      if (!TextUtils.isEmpty(link.getUrl())) {
+        MainActivity activity = (MainActivity) v.getContext();
+        activity.showWebView(link.getUrl());
+      }
+    });
   }
 
   private void bindThirdLine(RedditLink link) {

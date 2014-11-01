@@ -1,6 +1,8 @@
 package me.tabak.nerdery.data.reddit.model;
 
-public class RedditLink extends RedditSubmission {
+import java.io.Serializable;
+
+public class RedditLink extends RedditSubmission implements Serializable {
   String domain;
   String selftext_html;
   String selftext;

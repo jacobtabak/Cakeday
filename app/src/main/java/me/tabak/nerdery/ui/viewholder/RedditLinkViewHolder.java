@@ -83,7 +83,6 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
     } else {
       mPreviewImageView.setVisibility(View.VISIBLE);
       Ion.with(mPreviewImageView)
-          .animateGif(true)
           .smartSize(true)
           .load(thumbnail);
     }

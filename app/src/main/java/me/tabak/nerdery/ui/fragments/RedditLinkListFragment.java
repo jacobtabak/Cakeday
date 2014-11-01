@@ -169,6 +169,7 @@ public class RedditLinkListFragment extends Fragment {
     @Override
     public void onBindViewHolder(RedditLinkViewHolder holder, int position) {
       holder.bindView(mLinks.get(position));
+      holder.itemView.setOnClickListener(v -> mActivity.showDetailFragment(mLinks.get(position)));
     }
 
     @Override

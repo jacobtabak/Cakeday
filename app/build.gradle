@@ -6,7 +6,7 @@ android {
     buildToolsVersion "21.0.2"
 
     defaultConfig {
-        applicationId "me.tabak.nerdery"
+        applicationId "me.tabak.cakeday"
         minSdkVersion 9
         targetSdkVersion 21
         versionCode 1

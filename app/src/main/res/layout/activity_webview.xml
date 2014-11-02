@@ -41,7 +41,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <me.tabak.nerdery.ui.view.SplitActionBarButton
+            <me.tabak.cakeday.ui.view.SplitActionBarButton
                 android:id="@+id/webview_back"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -49,7 +49,7 @@
                 android:contentDescription="Back"
                 android:background="?attr/actionBarItemBackground"
                 android:src="@drawable/ic_action_arrow_left"/>
-            <me.tabak.nerdery.ui.view.SplitActionBarButton
+            <me.tabak.cakeday.ui.view.SplitActionBarButton
                 android:id="@+id/webview_forward"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -57,7 +57,7 @@
                 android:contentDescription="Forward"
                 android:background="?attr/actionBarItemBackground"
                 android:src="@drawable/ic_action_arrow_right"/>
-            <me.tabak.nerdery.ui.view.SplitActionBarButton
+            <me.tabak.cakeday.ui.view.SplitActionBarButton
                 android:id="@+id/webview_refresh"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -65,7 +65,7 @@
                 android:contentDescription="Reload"
                 android:background="?attr/actionBarItemBackground"
                 android:src="@drawable/ic_action_reload"/>
-            <me.tabak.nerdery.ui.view.SplitActionBarButton
+            <me.tabak.cakeday.ui.view.SplitActionBarButton
                 android:id="@+id/webview_browser"
                 android:layout_width="0dp"
                 android:layout_weight="1"

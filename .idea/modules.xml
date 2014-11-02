@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Cakeday.iml" filepath="$PROJECT_DIR$/Cakeday.iml" />
       <module fileurl="file://$PROJECT_DIR$/Nerdery.iml" filepath="$PROJECT_DIR$/Nerdery.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>
-

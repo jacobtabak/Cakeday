@@ -1,17 +1,21 @@
 package me.tabak.cakeday.ui.fragments;
 
 import android.app.AlertDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.tabak.cakeday.MainActivity;
 import me.tabak.cakeday.MyApplication;
@@ -30,10 +34,10 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RedditLinkListFragment extends RecyclerFragment {
+public class RedditLinkListFragment extends Fragment {
   public static final int LIMIT = 25;
   @Inject RedditService mRedditService;
-  @InjectView(R.id.recyclerview) RecyclerView mRecyclerView;
+  @InjectView(R.id.list_recyclerview) RecyclerView mRecyclerView;
   @InjectView(R.id.swipe_refresh_layout) SwipeRefreshLayout mSwipeRefreshLayout;
   private List<RedditLink> mLinks = new ArrayList<>();
   private RedditLinkAdapter mAdapter;
@@ -58,6 +62,14 @@ public class RedditLinkListFragment extends RecyclerFragment {
   }
 
   @Override
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                           @Nullable Bundle savedInstanceState) {
+    View view = inflater.inflate(R.layout.fragment_list, container, false);
+    ButterKnife.inject(this, view);
+    return view;
+  }
+
+  @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     mRefreshListener = new LinksRefreshListener();
@@ -65,11 +77,19 @@ public class RedditLinkListFragment extends RecyclerFragment {
     mLayoutManager = new LinearLayoutManager(getActivity());
     mRecyclerView.setLayoutManager(mLayoutManager);
     mRecyclerView.setAdapter(mAdapter);
-    mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
+    if (Build.VERSION.SDK_INT >= 11) {
+      mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
+    }
     mRecyclerView.setOnScrollListener(new LinkListScrollListener());
     if (mAdapter.getItemCount() == 0) {
       mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
     }
+    mSwipeRefreshLayout.setColorSchemeColors(
+        getResources().getColor(R.color.orange_bright),
+        getResources().getColor(R.color.orange_dark),
+        getResources().getColor(R.color.orange_light),
+        getResources().getColor(R.color.orange_pale)
+    );
   }
 
   @Override

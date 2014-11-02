@@ -11,6 +11,7 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "me.tabak.cakeday.TestRunner"
     }
 
     buildTypes {
@@ -28,6 +29,7 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'LICENSE.txt'
     }
 }
 
@@ -58,10 +60,6 @@ dependencies {
         exclude group: 'com.squareup.dagger', module: 'dagger'
         exclude group: 'javax.inject', module: 'javax.inject'
         exclude group: 'javax.annotation', module: 'javax.annotation-api'
-        exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
-        exclude group: 'org.hamcrest', module: 'hamcrest-core'
-        exclude group: 'org.hamcrest', module: 'hamcrest-library'
-        exclude group: 'org.hamcrest', module: 'hamcrest-integration'
     }
 }

@@ -1,7 +1,6 @@
 package me.tabak.nerdery.data.reddit;
 
 
-import me.tabak.nerdery.data.reddit.model.RedditComment;
 import me.tabak.nerdery.data.reddit.model.RedditListing;
 import me.tabak.nerdery.data.reddit.model.RedditMoreResponse;
 import me.tabak.nerdery.data.reddit.model.RedditResponse;
@@ -28,12 +27,11 @@ public interface RedditService {
       @Path("subreddit") String subreddit,
       @Path("id") String id,
       @Query("sort") String sort,
-      @Query("limit") Integer limit,
-      @Query("depth") Integer depth);
+      @Query("limit") Integer limit);
 
   @FormUrlEncoded
   @POST("/api/morechildren")
-  Observable<RedditMoreResponse<RedditComment>> getMoreComments(
+  Observable<RedditMoreResponse> getMoreComments(
       @Field("api_type") String apiType,
       @Field("link_id") String linkId,
       @Field("sort") String sort,

@@ -69,7 +69,7 @@ public class RedditLinkListFragment extends RecyclerFragment {
     mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
     mRecyclerView.setOnScrollListener(new LinkListScrollListener());
     if (mAdapter.getItemCount() == 0) {
-      mSwipeRefreshLayout.setRefreshing(true);
+      mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
     }
   }
 
@@ -216,7 +216,7 @@ public class RedditLinkListFragment extends RecyclerFragment {
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
       super.onScrolled(recyclerView, dx, dy);
 
-      // Load more items when the progressbar becomes visible.
+      // Load more items when there are LIMIT/2 items left before the end.
       if (!mSwipeRefreshLayout.isRefreshing()) {
         if (mLayoutManager.findLastVisibleItemPosition() > mLinks.size() - LIMIT * .5) {
           mSwipeRefreshLayout.setRefreshing(true);

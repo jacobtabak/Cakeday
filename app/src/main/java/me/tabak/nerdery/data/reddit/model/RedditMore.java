@@ -1,17 +1,13 @@
 package me.tabak.nerdery.data.reddit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RedditMore extends RedditObject {
-  int count;
   String parent_id;
   String id;
   String name;
   List<String> children;
-
-  public int getCount() {
-    return count;
-  }
 
   public String getParentId() {
     return parent_id;
@@ -27,5 +23,17 @@ public class RedditMore extends RedditObject {
 
   public List<String> getChildren() {
     return children;
+  }
+
+  /**
+   * Take up to count children from the front list.  They will be removed.
+   * @param count
+   * @return
+   */
+  public List<String> takeChildren(int count) {
+    List<String> subList = getChildren().subList(0, Math.min(getChildren().size(), count));
+    List<String> output = new ArrayList<>(subList);
+    subList.clear();
+    return output;
   }
 }

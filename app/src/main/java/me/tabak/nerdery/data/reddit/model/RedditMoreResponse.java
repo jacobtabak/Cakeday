@@ -3,18 +3,18 @@ package me.tabak.nerdery.data.reddit.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RedditMoreResponse<T> {
+public class RedditMoreResponse {
   public class RedditJson {
     RedditData data;
   }
 
   public class RedditData {
-    List<T> things;
+    List<RedditObject> things;
   }
 
   RedditJson json;
 
-  public List<T> getThings() {
+  public List<RedditObject> getThings() {
     if (json.data != null && json.data.things != null) {
       return json.data.things;
     } else {

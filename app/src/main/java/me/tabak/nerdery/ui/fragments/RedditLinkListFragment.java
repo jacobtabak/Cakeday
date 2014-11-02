@@ -68,6 +68,9 @@ public class RedditLinkListFragment extends RecyclerFragment {
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
     mRecyclerView.setOnScrollListener(new LinkListScrollListener());
+    if (mAdapter.getItemCount() == 0) {
+      mSwipeRefreshLayout.setRefreshing(true);
+    }
   }
 
   @Override

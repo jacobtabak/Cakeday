@@ -62,7 +62,7 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
   }
 
   private void bindTitle(RedditLink link, boolean full) {
-    mTitleTextView.setText(link.getTitle());
+    mTitleTextView.setText(link.getTitle().replace("&amp;", "&"));
     if (full) {
       mTitleTextView.setTextAppearance(mContext, R.style.Base_TextAppearance_AppCompat_Medium);
     } else {
@@ -72,7 +72,12 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
     mTitleTextView.setOnClickListener(v -> {
       if (!TextUtils.isEmpty(link.getUrl())) {
         MainActivity activity = (MainActivity) v.getContext();
-        activity.showWebView(link.getUrl());
+        // If the link is a 'self' link, don't open the webview.
+        if (link.isSelf()) {
+          activity.showDetailFragment(link);
+        } else {
+          activity.showWebView(link.getUrl());
+        }
       }
     });
   }

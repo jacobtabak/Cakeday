@@ -109,11 +109,14 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    inflater.inflate(R.menu.link_detail, menu);
-    menu.findItem(R.id.menu_show_list).setOnMenuItemClickListener(item -> {
-      mActivity.hideDetailFragment();
-      return true;
-    });
+    // Only show the 'show list' button if we're in dual pane mode.
+    if (mActivity.isDualPane()) {
+      inflater.inflate(R.menu.link_detail, menu);
+      menu.findItem(R.id.menu_show_list).setOnMenuItemClickListener(item -> {
+        mActivity.hideDetailPane();
+        return true;
+      });
+    }
   }
 
   private class CommentsAdapter extends RecyclerView.Adapter {

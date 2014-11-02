@@ -21,10 +21,8 @@ import me.tabak.nerdery.ui.fragments.RedditLinkListFragment;
 
 public class MainActivity extends ActionBarActivity implements FragmentManager.OnBackStackChangedListener {
   @InjectView(R.id.toolbar) Toolbar mToolbar;
-
   @InjectView(R.id.primary_container) ViewGroup mPrimaryContainer;
   @Optional @InjectView(R.id.secondary_container) ViewGroup mSecondaryContainer;
-  private boolean mDetailVisible;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +53,8 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
   }
 
   public void showDetailFragment(RedditLink link) {
-    mDetailVisible = true;
-
     RedditLinkDetailFragment fragment = RedditLinkDetailFragment.newInstance(link);
-    if (mSecondaryContainer == null) {
+    if (!isDualPane()) {
       getSupportFragmentManager()
           .beginTransaction()
           .setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left,
@@ -87,12 +83,8 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
     }
   }
 
-  public void hideDetailFragment() {
-    mDetailVisible = false;
-
-    if (mSecondaryContainer == null) {
-      getSupportFragmentManager().popBackStack();
-    } else {
+  public void hideDetailPane() {
+    if (isDualPane()) {
       float listWeight = getResources().getInteger(R.integer.list_expanded_weight);
       float detailWeight = getResources().getInteger(R.integer.detail_collapsed_weight);
       if (Build.VERSION.SDK_INT >= 11) {
@@ -104,6 +96,8 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
         mSecondaryContainer.setLayoutParams(
             new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, detailWeight));
       }
+    } else {
+      getSupportFragmentManager().popBackStack();
     }
   }
 
@@ -124,26 +118,23 @@ public class MainActivity extends ActionBarActivity implements FragmentManager.O
   }
 
   @Override
-  public void onBackPressed() {
-    if (mDetailVisible) {
-      hideDetailFragment();
-    } else {
-      super.onBackPressed();
-    }
-  }
-
-  @Override
   public boolean onSupportNavigateUp() {
-    if (mDetailVisible) {
-      hideDetailFragment();
+    // This will only be called from the detail screen since webview screen has its own toolbar.
+    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+      getSupportFragmentManager().popBackStack();
       return true;
     } else {
       return super.onSupportNavigateUp();
     }
   }
 
+  public boolean isDualPane() {
+    return mSecondaryContainer != null;
+  }
+
   @Override
   public void onBackStackChanged() {
-    getSupportActionBar().setDisplayHomeAsUpEnabled(getSupportFragmentManager().getBackStackEntryCount() > 0);
+    int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+    getSupportActionBar().setDisplayHomeAsUpEnabled(backStackEntryCount > 0);
   }
 }

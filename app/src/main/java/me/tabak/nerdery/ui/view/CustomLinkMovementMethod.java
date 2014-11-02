@@ -33,6 +33,10 @@ public class CustomLinkMovementMethod extends LinkMovementMethod {
       URLSpan[] link = buffer.getSpans(off, off, URLSpan.class);
       if (link.length != 0) {
         String url = link[0].getURL();
+        // handle relative links
+        if (url.startsWith("/")) {
+          url = "http://www.reddit.com" + url;
+        }
         if (url.startsWith("https") || url.startsWith("http")) {
           mActivity.showWebView(url);
           return true;

@@ -2,7 +2,6 @@ package me.tabak.nerdery.ui.viewholder;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -15,9 +14,9 @@ import butterknife.InjectView;
 import com.koushikdutta.ion.Ion;
 import me.tabak.nerdery.MainActivity;
 import me.tabak.nerdery.R;
+import me.tabak.nerdery.data.HtmlHelper;
 import me.tabak.nerdery.data.reddit.model.RedditLink;
 import me.tabak.nerdery.ui.view.CustomLinkMovementMethod;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 
 public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
@@ -42,7 +41,7 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
 
   public void bindView(RedditLink link, boolean full) {
     bindFirstLine(link);
-    bindTitle(link);
+    bindTitle(link, full);
     bindThirdLine(link);
     bindImage(link, full);
     bindSelfText(link, full);
@@ -62,8 +61,14 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
     mTopLineTextView.setText(builder);
   }
 
-  private void bindTitle(RedditLink link) {
+  private void bindTitle(RedditLink link, boolean full) {
     mTitleTextView.setText(link.getTitle());
+    if (full) {
+      mTitleTextView.setTextAppearance(mContext, R.style.Base_TextAppearance_AppCompat_Medium);
+    } else {
+      mTitleTextView.setTextAppearance(mContext, R.style.Base_TextAppearance_AppCompat_Small);
+    }
+    mTitleTextView.setTextColor(mContext.getResources().getColor(android.R.color.black));
     mTitleTextView.setOnClickListener(v -> {
       if (!TextUtils.isEmpty(link.getUrl())) {
         MainActivity activity = (MainActivity) v.getContext();
@@ -74,8 +79,8 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
 
   private void bindThirdLine(RedditLink link) {
     String age = PRETTY_TIME.format(link.getCreatedUtc().toDate());
-    String text = mContext.getString(R.string.link_bottom_line_template,
-        link.getNumComments(), link.getDomain(), age);
+    String text = mContext.getString(R.string.link_bottom_line_template, link.getNumComments(),
+        mContext.getResources().getQuantityString(R.plurals.comments, link.getNumComments()), link.getDomain(), age);
     mBottomLineTextView.setText(text);
   }
 
@@ -113,8 +118,7 @@ public class RedditLinkViewHolder extends RecyclerView.ViewHolder {
   private void bindSelfText(RedditLink link, boolean full) {
     if (full && !TextUtils.isEmpty(link.getSelftextHtml())) {
       mSelfTextView.setVisibility(View.VISIBLE);
-      String html = StringEscapeUtils.unescapeHtml(link.getSelftextHtml());
-      mSelfTextView.setText(Html.fromHtml(html));
+      mSelfTextView.setText(HtmlHelper.prepareHtml(link.getSelftextHtml()));
     } else {
       mSelfTextView.setVisibility(View.GONE);
     }

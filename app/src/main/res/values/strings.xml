@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Cake Day</string>
+    <string name="app_name">Cakeday</string>
     <string name="in">in</string>
-    <string name="link_bottom_line_template">%1$d Comments • %2$s • %3$s</string>
+    <string name="link_bottom_line_template">%1$d %2$s • %3$s • %4$s</string>
     <string name="listing_hot">Hot</string>
     <string name="listing_new">New</string>
     <string name="listing_rising">Rising</string>
@@ -10,4 +10,5 @@
     <string name="sort">Sort</string>
     <string name="clear_all">Clear All</string>
     <string name="show_list">Show List</string>
+    <string name="comment_metadata_template">%1$s • %2$d %3$s • %4$s</string>
 </resources>

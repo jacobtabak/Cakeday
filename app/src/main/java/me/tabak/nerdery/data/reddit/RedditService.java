@@ -13,6 +13,8 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
+import java.util.List;
+
 public interface RedditService {
   @GET("/{listing}.json?limit=25")
   Observable<RedditResponse<RedditListing>> getLinks(
@@ -22,9 +24,10 @@ public interface RedditService {
       @Query("before") String before);
 
   @GET("/r/{subreddit}/comments/{id}.json")
-  Observable<RedditResponse<RedditListing>> getComments(
+  Observable<List<RedditResponse<RedditListing>>> getComments(
       @Path("subreddit") String subreddit,
       @Path("id") String id,
+      @Query("sort") String sort,
       @Query("limit") Integer limit,
       @Query("depth") Integer depth);
 

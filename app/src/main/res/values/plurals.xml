@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <plurals name="points">
+    <item quantity="one">point</item>
+    <item quantity="other">points</item>
+  </plurals>
+  <plurals name="comments">
+    <item quantity="one">comment</item>
+    <item quantity="other">comments</item>
+  </plurals>
+</resources>

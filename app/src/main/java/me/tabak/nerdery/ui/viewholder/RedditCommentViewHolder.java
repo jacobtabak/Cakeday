@@ -19,6 +19,8 @@ import org.ocpsoft.prettytime.PrettyTime;
 public class RedditCommentViewHolder extends RecyclerView.ViewHolder {
   private final Context mContext;
   public static final PrettyTime PRETTY_TIME = new PrettyTime();
+  private final View mView;
+  private final RecyclerView.LayoutParams mLayoutParams;
   @InjectView(R.id.comment_metadata_textview) TextView mMetadataTextView;
   @InjectView(R.id.comment_body_textview) TextView mBodyTextView;
 
@@ -26,12 +28,22 @@ public class RedditCommentViewHolder extends RecyclerView.ViewHolder {
     super(itemView);
     mContext = itemView.getContext();
     ButterKnife.inject(this, itemView);
+    mView = itemView;
     mBodyTextView.setMovementMethod(new CustomLinkMovementMethod((MainActivity) itemView.getContext()));
+    mLayoutParams =
+        new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
   }
 
   public void bindView(RedditComment comment) {
+    setDepthMargin(comment.getDepth());
     bindMetadata(comment);
     bindBody(comment);
+  }
+
+  private void setDepthMargin(int depth) {
+    int marginLeft = depth * mContext.getResources().getDimensionPixelSize(R.dimen.small);
+    mLayoutParams.leftMargin = marginLeft;
+    mView.setLayoutParams(mLayoutParams);
   }
 
   private void bindBody(RedditComment comment) {

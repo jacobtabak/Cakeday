@@ -77,8 +77,4 @@ public class RedditLink extends RedditSubmission implements Serializable {
   public boolean isVisited() {
     return visited;
   }
-
-  public String getFullname() {
-    return "t3_" + getId();
-  }
 }

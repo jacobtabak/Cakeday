@@ -28,7 +28,6 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class RedditLinkListFragment extends RecyclerFragment {
@@ -189,8 +188,8 @@ public class RedditLinkListFragment extends RecyclerFragment {
 
       // Store the first and last IDs so we can get more later
       if (mLinks.size() > 0) {
-        mAfterId = mLinks.get(mLinks.size() - 1).getFullname();
-        mBeforeId = mLinks.get(0).getFullname();
+        mAfterId = mLinks.get(mLinks.size() - 1).getName();
+        mBeforeId = mLinks.get(0).getName();
       }
 
       mAdapter.notifyItemRangeInserted(startPos, links.size());
@@ -200,13 +199,8 @@ public class RedditLinkListFragment extends RecyclerFragment {
   private class LinksRefreshListener implements SwipeRefreshLayout.OnRefreshListener {
     @Override
     public void onRefresh() {
-      ArrayList<RedditLink> tempLinks = new ArrayList<>(mLinks);
-      Collections.reverse(tempLinks);
-      for (RedditLink link : tempLinks) {
-        mLinks.remove(link);
-      }
-      // We remove one extra because of the progressbar.
-      mAdapter.notifyItemRangeRemoved(0, tempLinks.size() + 1);
+      mAdapter.notifyItemRangeRemoved(0, mLinks.size());
+      mLinks.clear();
       createRequest(true).subscribe(new LinksObserver());
     }
   }

@@ -2,7 +2,7 @@ package me.tabak.nerdery.data.reddit;
 
 
 import me.tabak.nerdery.data.reddit.model.RedditListing;
-import me.tabak.nerdery.data.reddit.model.RedditMoreResponse;
+import me.tabak.nerdery.data.reddit.model.RedditMoreCommentsResponse;
 import me.tabak.nerdery.data.reddit.model.RedditResponse;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -31,9 +31,14 @@ public interface RedditService {
 
   @FormUrlEncoded
   @POST("/api/morechildren")
-  Observable<RedditMoreResponse> getMoreComments(
+  Observable<RedditMoreCommentsResponse> getMoreComments(
       @Field("api_type") String apiType,
       @Field("link_id") String linkId,
       @Field("sort") String sort,
       @Field("children") String children);
+
+  @GET("/r/{subreddit}/api/info.json")
+  Observable<RedditResponse<RedditListing>> getInfo(
+      @Path("subreddit") String subreddit,
+      @Query("id") String commaDelimitedIds);
 }

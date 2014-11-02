@@ -10,6 +10,11 @@ public class RedditComment extends RedditSubmission {
   String link_id;
   int depth;
 
+  // Constructor to create a comment stub
+  public RedditComment(String id) {
+    this.id = id;
+  }
+
   public RedditObject getReplies() {
     return replies;
   }

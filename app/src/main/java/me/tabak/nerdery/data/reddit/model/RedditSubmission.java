@@ -63,4 +63,15 @@ public class RedditSubmission extends RedditObject {
   public int getUps() {
     return ups;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof RedditSubmission) {
+      return getName().equals(((RedditSubmission) o).getName());
+    }
+    if (o instanceof String) {
+      return getName().equals(o);
+    }
+    return super.equals(o);
+  }
 }

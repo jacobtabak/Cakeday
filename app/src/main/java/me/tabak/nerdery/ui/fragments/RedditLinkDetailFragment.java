@@ -2,6 +2,7 @@ package me.tabak.nerdery.ui.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,12 +14,13 @@ import android.view.ViewGroup;
 import me.tabak.nerdery.MainActivity;
 import me.tabak.nerdery.MyApplication;
 import me.tabak.nerdery.R;
+import me.tabak.nerdery.data.adapters.ListingToCommentList;
+import me.tabak.nerdery.data.adapters.StubToListing;
 import me.tabak.nerdery.data.reddit.RedditService;
 import me.tabak.nerdery.data.reddit.model.RedditComment;
 import me.tabak.nerdery.data.reddit.model.RedditLink;
 import me.tabak.nerdery.data.reddit.model.RedditListing;
 import me.tabak.nerdery.data.reddit.model.RedditMore;
-import me.tabak.nerdery.data.reddit.model.RedditMoreResponse;
 import me.tabak.nerdery.data.reddit.model.RedditObject;
 import me.tabak.nerdery.data.reddit.model.RedditResponse;
 import me.tabak.nerdery.rx.EndlessObserver;
@@ -42,9 +44,9 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
   private CommentsAdapter mAdapter;
   private RedditLink mLink;
   private LinearLayoutManager mLayoutManager;
-  private List<RedditComment> mComments = new ArrayList<>();
+  private List<RedditComment> mComments;
   private RedditMore mMore;
-  private Observable<RedditMoreResponse> mMoreCommentsObservable;
+  private Observable<List<RedditComment>> mMoreCommentsObservable;
 
   public static RedditLinkDetailFragment newInstance(RedditLink link) {
     RedditLinkDetailFragment fragment = new RedditLinkDetailFragment();
@@ -65,6 +67,22 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
     loadComments();
   }
 
+  @Override
+  public void onViewCreated(View view, Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    mAdapter = new CommentsAdapter();
+    mLayoutManager = new LinearLayoutManager(getActivity());
+    mRecyclerView.setLayoutManager(mLayoutManager);
+    mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
+    mRecyclerView.setOnScrollListener(new MoreCommentsScrollListener());
+    mRecyclerView.setAdapter(mAdapter);
+    mSwipeRefreshLayout.setOnRefreshListener(new ReloadCommentsListener());
+    mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
+  }
+
+  /**
+   * Loads the first 25 comments for the current link, storing the More object to retrieve more later.
+   */
   private void loadComments() {
     mRedditService.getComments(mLink.getSubreddit(), mLink.getId(), "new", LIMIT)
         .map(new Func1<List<RedditResponse<RedditListing>>, List<RedditComment>>() {
@@ -77,7 +95,8 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
             List<RedditComment> comments = new ArrayList<>();
             for (RedditObject redditObject : redditObjects) {
               if (redditObject instanceof RedditComment) {
-                comments.add((RedditComment) redditObject);
+                RedditComment comment = (RedditComment) redditObject;
+                recursiveAddComment(comments, comment);
               } else if (redditObject instanceof RedditMore) {
                 mMore = (RedditMore) redditObject;
               }
@@ -102,21 +121,9 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
           public void onNext(List<RedditComment> comments) {
             mSwipeRefreshLayout.setRefreshing(false);
             mComments = comments;
-            mRecyclerView.setAdapter(mAdapter);
             mAdapter.notifyItemRangeInserted(0, comments.size() + 1);
           }
         });
-  }
-
-  @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    mAdapter = new CommentsAdapter();
-    mLayoutManager = new LinearLayoutManager(getActivity());
-    mRecyclerView.setLayoutManager(mLayoutManager);
-    mRecyclerView.setItemAnimator(new MyItemAnimator(mLayoutManager));
-    mRecyclerView.setOnScrollListener(new MoreCommentsScrollListener());
-    mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(true));
   }
 
   @Override
@@ -131,6 +138,30 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
     }
   }
 
+  /**
+   * Adds a comment and all of its child comments to a list, and keeps track of their depth.
+   * @param comments
+   * @param comment
+   */
+  private void recursiveAddComment(List<RedditComment> comments, RedditComment comment) {
+    comments.add(comment);
+    if (comment.getReplies() != null) {
+      RedditListing repliesListing = (RedditListing) comment.getReplies();
+      for (RedditObject redditObject : repliesListing.getChildren()) {
+        // replies can be of type 'more' but we're not going to worry about that here
+        if (redditObject instanceof RedditComment) {
+          RedditComment childComment = (RedditComment) redditObject;
+          // increment the depth of the child so it can be indented
+          childComment.setDepth(comment.getDepth() + 1);
+          recursiveAddComment(comments, childComment);
+        }
+      }
+    }
+  }
+
+  /**
+   * Adapter that shows the link first, then all of the comments.
+   */
   private class CommentsAdapter extends RecyclerView.Adapter {
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENT = 1;
@@ -179,7 +210,7 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
 
     @Override
     public int getItemCount() {
-      return mComments.size() + 1;
+      return mComments != null ? mComments.size() + 1 : 0;
     }
   }
 
@@ -193,7 +224,9 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
           List<String> strings = mMore.takeChildren(LIMIT);
           String children = TextUtils.join(",", strings);
           // Save this observable to a field so we can re-subscribe if there is a failure.
-          mMoreCommentsObservable = mRedditService.getMoreComments("json", mMore.getParentId(), "new", children);
+          mMoreCommentsObservable = mRedditService.getMoreComments("json", mMore.getParentId(), "new", children)
+              .flatMap(new StubToListing(mRedditService, mLink))
+              .map(new ListingToCommentList());
           mMoreCommentsObservable
               .observeOn(AndroidSchedulers.mainThread())
               .subscribe(new MoreCommentsObserver());
@@ -202,7 +235,7 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
     }
   }
 
-  private class MoreCommentsObserver extends EndlessObserver<RedditMoreResponse> {
+  private class MoreCommentsObserver extends EndlessObserver<List<RedditComment>> {
     @Override
     public void onError(Throwable e) {
       mSwipeRefreshLayout.setRefreshing(false);
@@ -218,12 +251,25 @@ public class RedditLinkDetailFragment extends RecyclerFragment {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onNext(RedditMoreResponse response) {
+    public void onNext(List<RedditComment> comments) {
       mSwipeRefreshLayout.setRefreshing(false);
-      List<RedditObject> objects = response.getThings();
-      List<RedditComment> comments = (List) objects;
+      // Reduce the size of the list if it's over the limit.
+      if (mComments.size() > LIMIT) {
+        mComments = mComments.subList(LIMIT, mComments.size());
+        mAdapter.notifyItemRangeRemoved(1, LIMIT);
+      }
       mComments.addAll(comments);
-      mAdapter.notifyItemRangeInserted(mComments.size() - objects.size(), objects.size());
+      mAdapter.notifyItemRangeInserted(mComments.size() - comments.size(), comments.size());
+    }
+  }
+
+  private class ReloadCommentsListener implements SwipeRefreshLayout.OnRefreshListener {
+    @Override
+    public void onRefresh() {
+      int count = mAdapter.getItemCount();
+      mComments = null;
+      mAdapter.notifyItemRangeRemoved(0, count);
+      loadComments();
     }
   }
 }
